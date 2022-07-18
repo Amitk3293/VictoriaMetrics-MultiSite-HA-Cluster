@@ -95,7 +95,7 @@ vmsingle:
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmsinglespec
   spec:
     image:
-      tag: v1.78.1
+      tag: v1.79.0
     retentionPeriod: "14"
     replicaCount: 1
     storage:
@@ -150,7 +150,7 @@ vmcluster:
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.78.1-cluster
+        tag: v1.79.0-cluster
       replicaCount: 3
       storageDataPath: "/vm-data"
       storage:
@@ -165,7 +165,7 @@ vmcluster:
           memory: 2000Mi
     vmselect:
       image:
-        tag: v1.78.1-cluster
+        tag: v1.79.0-cluster
       replicaCount: 3
       cacheMountPath: "/select-cache"
       storage:
@@ -201,7 +201,7 @@ vmcluster:
 
     vminsert:
       image:
-        tag: v1.78.1-cluster
+        tag: v1.79.0-cluster
       replicaCount: 3
       resources:
         limits:
@@ -245,7 +245,7 @@ vmcluster:
       pathType: Prefix
 
       hosts:
-        - ml-vmstorage.domain.com
+        - 2nd-vmstorage.domain.com
       ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
       # - path: /*
@@ -280,7 +280,7 @@ vmcluster:
       pathType: Prefix
 
       hosts:
-        - ml-vmselect.domain.com
+        - 2nd-vmselect.domain.com
       ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
       # - path: /*
@@ -315,7 +315,7 @@ vmcluster:
       pathType: Prefix
 
       hosts:
-        - ml-vminsert.domain.com
+        - 2nd-vminsert.domain.com
       ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
       extraPaths: []
       # - path: /*
@@ -346,7 +346,7 @@ alertmanager:
     selectAllByDefault: true
     image:
       tag: v0.24.0
-    externalURL: "http://ml-vmalertmanager.domain.com"
+    externalURL: "http://2nd-vmalertmanager.domain.com"
     routePrefix: /
     additionalPeers: [10.14.0.18:9094] ####### approve to get into cluster mode
 
@@ -358,8 +358,8 @@ alertmanager:
     global:
       resolve_timeout: 5m
       # slack_api_url: 
-      #    - https://hooks.slack.com/services/T02UF58DE/B03LKP7MSQ5/XXXXXXXXXXXX #prod-victoriametrics-alerts
-      #    - https://hooks.slack.com/services/T02UF58DE/B03PBHZK2AE/XXXXXXXXXXXX #dev-victoriametrics-alerts
+      #    - https://hooks.slack.com/services/XXXXXXXX/XXXXXXXXX/XXXXXXXXXXXX #prod-victoriametrics-alerts
+      #    - https://hooks.slack.com/services/XXXXXXXX/XXXXXXXXX/XXXXXXXXXXXX #dev-victoriametrics-alerts
     templates:
       - "/etc/vm/configs/**/*.tmpl"
     route:
@@ -398,7 +398,7 @@ alertmanager:
       - name: "slack-monitoring"
         slack_configs:
           - channel: "#main-victoriametrics-alerts"
-            api_url: https://hooks.slack.com/services/T02UF58DE/B03PBHZK2AE/XXXXXXX
+            api_url: https://hooks.slack.com/services/XXXXXXXX/XXXXXXXX/XXXXXXX
             send_resolved: true
             title: '{{ template "slack.monzo.title" . }}'
             icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
@@ -447,7 +447,7 @@ alertmanager:
       # - name: "slack-prod"
       #   slack_configs:
       #     - channel: "#prod-victoriametrics-alerts"
-      #       api_url: https://hooks.slack.com/services/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
+      #       api_url: https://hooks.slack.com/services/XXXXXXXXXX/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXX
       #       send_resolved: true
       #       title: '{{ template "slack.monzo.title" . }}'
       #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
@@ -510,7 +510,7 @@ alertmanager:
     pathType: Prefix
 
     hosts:
-      - ml-vmalertmanager.domain.com
+      - 2nd-vmalertmanager.domain.com
     ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /
@@ -538,7 +538,7 @@ vmalert:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.78.1
+      tag: v1.79.0
     evaluationInterval: 15s
   ingress:
     enabled: true
@@ -556,7 +556,7 @@ vmalert:
     pathType: Prefix
 
     hosts:
-      - ml-vmalert.domain.com
+      - 2nd-vmalert.domain.com
     ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /*
@@ -588,7 +588,7 @@ vmagent:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.78.1
+      tag: v1.79.0
     scrapeInterval: 25s
     externalLabels:
       cluster: k8s-2nd-cluster-name
@@ -611,7 +611,7 @@ vmagent:
     pathType: Prefix
 
     hosts:
-      - ml-vmagent.domain.com
+      - 2nd-vmagent.domain.com
     ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /*
@@ -639,6 +639,10 @@ grafana:
   enabled: false
   ## all values for grafana helm chart can be specified here
   sidecar:
+    image:
+      repository: quay.io/kiwigrid/k8s-sidecar
+      tag: 1.19.2
+      sha: ""
     datasources:
       enabled: true
       createVMReplicasDatasources: false
@@ -651,6 +655,31 @@ grafana:
       additionalDashboardAnnotations: {}
       enabled: true
       multicluster: false
+      provider:
+        allowUiUpdates: true
+
+  image:
+    repository: grafana/grafana
+    tag: 9.0.2
+    sha: ""
+    pullPolicy: IfNotPresent
+
+  persistence:
+    type: pvc
+    enabled: true
+    storageClassName: standard
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    # annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+    # selectorLabels: {}
+    # subPath: ""
+    # existingClaim:
+
+  deploymentStrategy:
+    type: Recreate
 
   ## ForceDeployDatasource Create datasource configmap even if grafana deployment has been disabled
   forceDeployDatasource: false
@@ -709,7 +738,7 @@ grafana:
     pathType: Prefix
 
     hosts:
-      - ml-vmgrafana.domain.com
+      - 2nd-vmgrafana.domain.com
     ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
     extraPaths: []
     # - path: /*
