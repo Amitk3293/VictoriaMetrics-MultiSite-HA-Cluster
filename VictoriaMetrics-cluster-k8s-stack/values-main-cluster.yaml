@@ -95,7 +95,7 @@ vmsingle:
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmsinglespec
   spec:
     image:
-      tag: v1.78.1
+      tag: v1.79.0
     retentionPeriod: "14"
     replicaCount: 1
     storage:
@@ -150,7 +150,7 @@ vmcluster:
     replicationFactor: 2
     vmstorage:
       image:
-        tag: v1.78.1-cluster
+        tag: v1.79.0-cluster
       replicaCount: 3
       storageDataPath: "/vm-data"
       storage:
@@ -165,7 +165,7 @@ vmcluster:
           memory: 2000Mi
     vmselect:
       image:
-        tag: v1.78.1-cluster
+        tag: v1.79.0-cluster
       replicaCount: 3
       cacheMountPath: "/select-cache"
       storage:
@@ -182,6 +182,7 @@ vmcluster:
           cpu: "0.5"
           memory: "500Mi"
 
+      # Horizontal Pod Autoscaling
       hpa:
         # -- Use HPA for vmselect component
         enabled: true
@@ -200,7 +201,7 @@ vmcluster:
 
     vminsert:
       image:
-        tag: v1.78.1-cluster
+        tag: v1.79.0-cluster
       replicaCount: 3
       resources:
         limits:
@@ -347,7 +348,7 @@ alertmanager:
       tag: v0.24.0
     externalURL: "http://vmalertmanager.domain.com"
     routePrefix: /
-    additionalPeers: [10.14.0.18:9094] ####### approve to get into cluster mode
+    additionalPeers: [10.14.X.X:9094] ####### approve to get into cluster mode
 
 
     # if this one defined, it will be used for alertmanager configuration and config parameter will be ignored
@@ -357,8 +358,8 @@ alertmanager:
     global:
       resolve_timeout: 5m
       # slack_api_url: 
-      #    - https://hooks.slack.com/services/T02UF58DE/B03LKP7MSQ5/XXXXXXXXXXXX #prod-victoriametrics-alerts
-      #    - https://hooks.slack.com/services/T02UF58DE/B03PBHZK2AE/XXXXXXXXXXXX #dev-victoriametrics-alerts
+      #    - https://hooks.slack.com/services/XXXXXX/XXXXXXXX/XXXXXXXXXXXX #prod-victoriametrics-alerts
+      #    - https://hooks.slack.com/services/XXXXXXXX/XXXXXXX/XXXXXXXXXXXX #dev-victoriametrics-alerts
     templates:
       - "/etc/vm/configs/**/*.tmpl"
     route:
@@ -370,7 +371,7 @@ alertmanager:
       routes:
         ###################################################
         #### ADD THIS IF YOU WANT TO ROUTE ALERTS TO DIFF SLACK CHANNELS BASED ON CLUSTER LABEL #####
-        # - matchers: ###### ADD THIS IF YOU WANT TO ROUTE ALERTS TO DIFF SLACK CHANNELS BASED ON CLUSTER LABEL #####
+        # - matchers: 
         #     - cluster=~"k8s-prod-.*"
         #   receiver: slack-prod
 
@@ -397,7 +398,7 @@ alertmanager:
       - name: "slack-monitoring"
         slack_configs:
           - channel: "#main-victoriametrics-alerts"
-            api_url: https://hooks.slack.com/services/T02UF58DE/B03PBHZK2AE/XXXXXXX
+            api_url: https://hooks.slack.com/services/XXXXXX/XXXXXX/XXXXXXX
             send_resolved: true
             title: '{{ template "slack.monzo.title" . }}'
             icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
@@ -446,7 +447,7 @@ alertmanager:
       # - name: "slack-prod"
       #   slack_configs:
       #     - channel: "#prod-victoriametrics-alerts"
-      #       api_url: https://hooks.slack.com/services/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
+      #       api_url: https://hooks.slack.com/services/XXXXXXXXXX/XXXXXXXXXXXXXXXX
       #       send_resolved: true
       #       title: '{{ template "slack.monzo.title" . }}'
       #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
@@ -537,7 +538,7 @@ vmalert:
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.78.1
+      tag: v1.79.0
     evaluationInterval: 15s
   ingress:
     enabled: true
@@ -581,13 +582,13 @@ vmagent:
   # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
   # defined spec will be added to the remoteWrite configuration of VMAgent
   additionalRemoteWrites: 
-    - url: http://ml-vminsert.domain.com/insert/0/prometheus/api/v1/write
+    - url: http://2nd-vminsert.domain.com/insert/0/prometheus/api/v1/write
   # spec for VMAgent crd
   # https://docs.victoriametrics.com/operator/blob/master/docs/api.MD#vmagentspec
   spec:
     selectAllByDefault: true
     image:
-      tag: v1.78.1
+      tag: v1.79.0
     scrapeInterval: 25s
     externalLabels:
       cluster: cluster-name
@@ -679,8 +680,6 @@ grafana:
 
   deploymentStrategy:
     type: Recreate
-
-
 
   ## ForceDeployDatasource Create datasource configmap even if grafana deployment has been disabled
   forceDeployDatasource: false
