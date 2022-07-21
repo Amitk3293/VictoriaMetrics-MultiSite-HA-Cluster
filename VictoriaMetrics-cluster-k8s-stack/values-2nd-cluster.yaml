@@ -146,7 +146,7 @@ vmcluster:
   # spec for VMSingle crd
   # https://github.com/VictoriaMetrics/operator/blob/master/docs/api.MD#vmclusterspec
   spec:
-    retentionPeriod: "14"
+    retentionPeriod: "60d"
     replicationFactor: 2
     vmstorage:
       image:
@@ -163,6 +163,11 @@ vmcluster:
         limits:
           cpu: "1.5"
           memory: 2000Mi
+
+      # ##Using Spot nodes for VMselecet & VMinsert ? If yes, uncomment it and attach VMstorage to use only on-demand nodes
+      #   nodeSelector:
+      #     pool: "internal-prod-ops-1-on-demand"
+
     vmselect:
       image:
         tag: v1.79.0-cluster
@@ -181,6 +186,10 @@ vmcluster:
         requests:
           cpu: "0.5"
           memory: "500Mi"
+
+      # ##Running on Spot nodes ? if yes, uncomment it and select the relevant node label
+      #   nodeSelector:
+      #     cloud.google.com/gke-spot: "true"
 
       # Horizontal Pod Autoscaling
       hpa:
@@ -211,6 +220,10 @@ vmcluster:
           cpu: "0.5"
           memory: "500Mi"
 
+      # ##Running on Spot nodes ? if yes, uncomment it and select the relevant node label
+      #   nodeSelector:
+      #     cloud.google.com/gke-spot: "true"
+
       # Horizontal Pod Autoscaling
       hpa:
         # -- Use HPA for vminsert component
@@ -237,7 +250,7 @@ vmcluster:
       # Values can be templated
       annotations:
         {}
-        # kubernetes.io/ingress.class: gce
+        # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       labels: {}
       path: /
@@ -272,7 +285,7 @@ vmcluster:
       # Values can be templated
       annotations:
         {}
-        # kubernetes.io/ingress.class: gce
+        # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       labels: {}
       path: /
@@ -307,7 +320,7 @@ vmcluster:
       # Values can be templated
       annotations:
         {}
-        # kubernetes.io/ingress.class: gce
+        # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       labels: {}
       path: /
@@ -348,7 +361,7 @@ alertmanager:
       tag: v0.24.0
     externalURL: "http://2nd-vmalertmanager.domain.com"
     routePrefix: /
-    additionalPeers: [10.14.X.X:9094]  #### Alertmanager-partner-peer-IP
+    # additionalPeers: [10.14.X.X:9094]  #### Alertmanager-partner-peer-IP
 
 
     # if this one defined, it will be used for alertmanager configuration and config parameter will be ignored
@@ -358,12 +371,12 @@ alertmanager:
     global:
       resolve_timeout: 5m
       # slack_api_url: 
-      #    - https://hooks.slack.com/services/XXXXXXXX/XXXXXXXXX/XXXXXXXXXXXX #prod-victoriametrics-alerts
-      #    - https://hooks.slack.com/services/XXXXXXXX/XXXXXXXXX/XXXXXXXXXXXX #dev-victoriametrics-alerts
+      #    - https://hooks.slack.com/services/XXXXXX/XXXXXXXX/XXXXXXXXXXXX #prod-victoriametrics-alerts
+      #    - https://hooks.slack.com/services/XXXXXXXX/XXXXXXX/XXXXXXXXXXXX #dev-victoriametrics-alerts
     templates:
       - "/etc/vm/configs/**/*.tmpl"
     route:
-      group_by: ["alertgroup", "job", "cluster"]  ##make sure that cluster-label is configured to have group_by cluster
+      group_by: ["alertgroup", "job", "cluster"] ##make sure that cluster-label is configured to have group_by cluster
       group_wait: 31s
       group_interval: 5m
       repeat_interval: 12h
@@ -398,7 +411,7 @@ alertmanager:
       - name: "slack-monitoring"
         slack_configs:
           - channel: "#main-victoriametrics-alerts"
-            api_url: https://hooks.slack.com/services/XXXXXXXX/XXXXXXXX/XXXXXXX
+            api_url: https://hooks.slack.com/services/XXXXXX/XXXXXX/XXXXXXX
             send_resolved: true
             title: '{{ template "slack.monzo.title" . }}'
             icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
@@ -447,7 +460,7 @@ alertmanager:
       # - name: "slack-prod"
       #   slack_configs:
       #     - channel: "#prod-victoriametrics-alerts"
-      #       api_url: https://hooks.slack.com/services/XXXXXXXXXX/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXX
+      #       api_url: https://hooks.slack.com/services/XXXXXXXXXX/XXXXXXXXXXXXXXXX
       #       send_resolved: true
       #       title: '{{ template "slack.monzo.title" . }}'
       #       icon_emoji: '{{ template "slack.monzo.icon_emoji" . }}'
@@ -591,9 +604,9 @@ vmagent:
       tag: v1.79.0
     scrapeInterval: 25s
     externalLabels:
-      cluster: k8s-2nd-cluster-name
+      cluster: k8s-2nd-cluster
     extraArgs:
-      remoteWrite.label: cluster=k8s-2nd-cluster-name
+      remoteWrite.label: cluster=k8s-2nd-cluster
       promscrape.streamParse: "true"
   ingress:
     enabled: true
@@ -654,13 +667,13 @@ grafana:
       additionalDashboardLabels: {}
       additionalDashboardAnnotations: {}
       enabled: true
-      multicluster: false
+      multicluster: true
       provider:
         allowUiUpdates: true
 
   image:
     repository: grafana/grafana
-    tag: 9.0.2
+    tag: 9.0.3
     sha: ""
     pullPolicy: IfNotPresent
 
@@ -825,7 +838,7 @@ kubelet:
       - action: labeldrop
         regex: (uid)
       - action: labeldrop
-        regex: (id|name|image)
+        regex: (id|name)
       - action: drop
         source_labels: [__name__]
         regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
