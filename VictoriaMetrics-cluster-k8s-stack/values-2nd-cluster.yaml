@@ -164,9 +164,6 @@ vmcluster:
           cpu: "1.5"
           memory: 2000Mi
 
-      # ##Using Spot nodes for VMselecet & VMinsert ? If yes, uncomment it and attach VMstorage to use only on-demand nodes
-      #   nodeSelector:
-      #     pool: "internal-prod-ops-1-on-demand"
 
     vmselect:
       image:
@@ -187,9 +184,14 @@ vmcluster:
           cpu: "0.5"
           memory: "500Mi"
 
-      # ##Running on Spot nodes ? if yes, uncomment it and select the relevant node label
+      # ##Running on Spot nodes ? if yes, uncomment it and modify to your relevant labels/tolerations
       #   nodeSelector:
       #     cloud.google.com/gke-spot: "true"
+      #   tolerations:
+      #   - key: "SPOT"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
 
       # Horizontal Pod Autoscaling
       hpa:
@@ -220,9 +222,14 @@ vmcluster:
           cpu: "0.5"
           memory: "500Mi"
 
-      # ##Running on Spot nodes ? if yes, uncomment it and select the relevant node label
+      # ##Running on Spot nodes ? if yes, uncomment it and modify to your relevant labels/tolerations
       #   nodeSelector:
       #     cloud.google.com/gke-spot: "true"
+      #   tolerations:
+      #   - key: "SPOT"
+      #     operator: "Equal"
+      #     value: "true"
+      #     effect: "NoSchedule"
 
       # Horizontal Pod Autoscaling
       hpa:
