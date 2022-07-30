@@ -3,7 +3,7 @@
 
 This repo is customized to deploy cost-effective, redundant, dynamic-scalability and high-performance monitoring platform using VictoriaMetrics on spot nodes.
 
-### we can find all the details in this Medium article I wrote: [all-at-once-monster-multi-site-monitoring-platform-with-victoriametrics, A practical guide!](https://medium.com/everything-full-stack/what-makes-victoriametrics-the-new-de-facto-standard-choice-for-open-source-monitoring-5d2b66b6e292)
+### we can find all the details in this Medium article I wrote: [Multi-site monitoring with HA and dynamic scale using VictoriaMetrics. A Practical guide](https://medium.com/everything-full-stack/what-makes-victoriametrics-the-new-de-facto-standard-choice-for-open-source-monitoring-5d2b66b6e292)
 
 The repo contains the VictoriaMetrics-k8s-stack official helm charts in 2 folders with customized values.
 
