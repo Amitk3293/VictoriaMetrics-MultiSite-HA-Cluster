@@ -19,7 +19,7 @@ The repo contains the VictoriaMetrics-k8s-stack official helm charts in 2 folder
 
 [What makes VictoriaMetrics the new de-facto standard choice for open source monitoring](https://medium.com/everything-full-stack/what-makes-victoriametrics-the-new-de-facto-standard-choice-for-open-source-monitoring-5d2b66b6e292)
 
-[all-at-once-monster-multi-site-monitoring-platform-with-victoriametrics, A practical guide!](https://medium.com/everything-full-stack/what-makes-victoriametrics-the-new-de-facto-standard-choice-for-open-source-monitoring-5d2b66b6e292)
+[Multi-site monitoring with HA and dynamic scale using VictoriaMetrics. A Practical guide](https://medium.com/everything-full-stack/what-makes-victoriametrics-the-new-de-facto-standard-choice-for-open-source-monitoring-5d2b66b6e292)
 
 
 ## Authors 
